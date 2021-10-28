@@ -31,7 +31,7 @@ public class UserServiceImp implements UserService, UserDetailsService {
 
     @Override
     public void addUser(User user) {
-        user.setPassword(BCrypt.hashpw(user.getPassword(),BCrypt.gensalt()));
+        user.setPassword(BCrypt.hashpw(user.getPassword(), BCrypt.gensalt()));
         userRepo.save(user);
     }
 
@@ -41,8 +41,7 @@ public class UserServiceImp implements UserService, UserDetailsService {
         User u = userRepo.getUserById(id);
         try {
             userRepo.deleteUserById(id);
-        }
-        catch(Exception e) {
+        } catch (Exception e) {
             throw new BusinessException(404, "Not found unable to delete");
         }
     }
@@ -53,14 +52,10 @@ public class UserServiceImp implements UserService, UserDetailsService {
         Timestamp t = Timestamp.from(Instant.now());
         try {
             User existing = userRepo.getUserById(id);
-            if (user.getName() == null)
-                user.setName(existing.getName());
-            if (user.getAddress() == null)
-                user.setAddress(existing.getAddress());
-            if (user.getEmail() == null)
-                user.setEmail(existing.getEmail());
-            if (user.getPhoneNumber() == 0)
-                user.setPhoneNumber(existing.getPhoneNumber());
+            user.setName(user.getName() == null ? existing.getName() : user.getName());
+            user.setAddress(user.getAddress() == null ? existing.getAddress() : user.getAddress());
+            user.setEmail(user.getEmail() == null ? existing.getEmail() : user.getEmail());
+            user.setPhoneNumber(user.getPhoneNumber() == 0 ? existing.getPhoneNumber() : user.getPhoneNumber());
             userRepo.UpdateAddress(id, user.getName(), user.getEmail(), user.getAddress(), user.getPhoneNumber(), t);
         } catch (Exception e) {
             throw new BusinessException(404, "User not found in database");
@@ -80,14 +75,14 @@ public class UserServiceImp implements UserService, UserDetailsService {
     public Optional<UserView> getUserByName(String name) {
 
         Optional<UserView> user = userRepo.GetUserByName(name);
-        user.orElseThrow(() -> new BusinessException(404,"User: "+name+"Not found"));
+        user.orElseThrow(() -> new BusinessException(404, "User: " + name + "Not found"));
         return user;
     }
 
     @Override
     public UserDetails loadUserByUsername(String name) throws UsernameNotFoundException {
         Optional<User> us = userRepo.loadUserByName(name);
-        us.orElseThrow(() -> new UsernameNotFoundException("User "+name.toUpperCase()+"Not found"));
+        us.orElseThrow(() -> new UsernameNotFoundException("User " + name.toUpperCase() + "Not found"));
         User user = us.get();
         return new org.springframework.security.core.userdetails.User(
                 user.getName(),

@@ -52,11 +52,6 @@ public class UserController {
     @Autowired
     Jwt jwt;
 
-    @Autowired
-    AuthenticationManager authenticationManager;
-
-
-
     @PostMapping("user-management/user")
     @ApiOperation(value = "Add User", notes = "Id,updatedAt,createdAt will be Auto Generated Please remove fields")
     public ResponseEntity<?> user(@Valid @RequestBody User user) {
