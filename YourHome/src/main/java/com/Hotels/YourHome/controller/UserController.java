@@ -1,10 +1,10 @@
 package com.Hotels.YourHome.controller;
 
 
+import com.Hotels.YourHome.constants.MyConstants;
 import com.Hotels.YourHome.customException.ControllerException;
 import com.Hotels.YourHome.jwt.Jwt;
 import com.Hotels.YourHome.models.User;
-import com.Hotels.YourHome.models.UserLogin;
 import com.Hotels.YourHome.projections.UserView;
 import com.Hotels.YourHome.service.UserService;
 import com.Hotels.YourHome.validators.OnlyWords;
@@ -15,13 +15,8 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
@@ -34,6 +29,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+
+
 
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
@@ -59,7 +56,7 @@ public class UserController {
         HttpHeaders headers = new HttpHeaders();
         headers.add("desc", "Add user");
         Map<String,Object> body = new HashMap<>();
-        body.put("Status","Created user");
+        body.put("Status",MyConstants.USER_CREATED);
         body.put("Details",user);
         return ResponseEntity.status(HttpStatus.CREATED).headers(headers).body(body);
     }
@@ -70,7 +67,7 @@ public class UserController {
         userService.delete(Integer.parseInt(id));
         HttpHeaders headers = new HttpHeaders();
         headers.add("desc", "Delete by id");
-        return ResponseEntity.status(HttpStatus.OK).headers(headers).body("Deleted!");
+        return ResponseEntity.status(HttpStatus.OK).headers(headers).body(MyConstants.DELETED);
     }
 
     @GetMapping("user-management/users")
@@ -79,8 +76,11 @@ public class UserController {
     public ResponseEntity<?> getAllUser(HttpServletResponse response, Principal p) throws IOException {
         List<UserView> users = userService.getUser();
         HttpHeaders headers = new HttpHeaders();
+        Map<String,Object> body = new HashMap<>();
+        body.put("status",MyConstants.SUCESS_STATUS);
+        body.put("users",users);
         headers.add("desc", "Get all the Users");
-        return ResponseEntity.status(HttpStatus.OK).headers(headers).body(users);
+        return ResponseEntity.status(HttpStatus.OK).headers(headers).body(body);
     }
 
     @GetMapping("admin/user-management/user")
@@ -90,8 +90,11 @@ public class UserController {
 
         Optional<UserView> user1 = userService.getUserByName(name);
         HttpHeaders headers = new HttpHeaders();
+        Map<Object,Object> body = new HashMap<>();
+        body.put("status",MyConstants.SUCESS_STATUS);
+        body.put("result",user1);
         headers.add("desc", "Getting user by name");
-        return ResponseEntity.status(HttpStatus.OK).headers(headers).body(user1);
+        return ResponseEntity.status(HttpStatus.OK).headers(headers).body(body);
     }
 
     @PutMapping("user-management/{id}/update")
@@ -105,7 +108,7 @@ public class UserController {
 
     @GetMapping("/refreshToken")
     @ApiOperation(value = "Refresh")
-    public void Login(HttpServletRequest request, HttpServletResponse response) throws IOException {
+    public void refreshToken(HttpServletRequest request, HttpServletResponse response) throws IOException {
         String token = request.getHeader(AUTHORIZATION);
         if (token != null) {
             try {

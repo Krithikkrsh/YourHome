@@ -68,6 +68,8 @@ public class RoomServiceImp implements RoomService {
 
     @Override
     public Optional<RoomView> getRoomById(int id) {
+        Optional<RoomView> room = roomRepo.getRoomsById(id);
+        room.orElseThrow(() -> new BusinessException(404,"Room not found"));
         return roomRepo.getRoomsById(id);
     }
 }

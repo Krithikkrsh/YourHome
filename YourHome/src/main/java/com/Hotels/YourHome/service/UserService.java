@@ -12,4 +12,5 @@ public interface UserService {
     void updateUser(int id,User user);
     List<UserView> getUser();
     Optional<UserView> getUserByName(String name);
+    void sleep(int seconds);
 }
